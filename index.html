@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <!-- 核心：适配手机屏幕 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>请假申请</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "微软雅黑", sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+
+        /* 文字样式 */
+        .title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .content {
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        /* 表情包 */
+        .emoji {
+            font-size: 60px;
+            margin: 20px 0;
+        }
+
+        /* 按钮容器 */
+        .btn-box {
+            display: flex;
+            gap: 20px;
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+            height: 100px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 接受按钮 */
+        #acceptBtn {
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            position: absolute;
+            left: 0;
+        }
+
+        /* 拒绝按钮 */
+        #refuseBtn {
+            padding: 12px 25px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            position: absolute;
+            right: 0;
+            transition: all 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="title" id="title">你的愚蠢大学生向你发送了一封请假申请</div>
+    <div class="emoji" id="emoji">🥺</div>
+    <div class="content" id="content">你的学生向你发出一份请假申请，是否接受</div>
+
+    <div class="btn-box">
+        <button id="acceptBtn">接受</button>
+        <button id="refuseBtn">拒绝</button>
+    </div>
+
+    <script>
+        // 获取元素
+        const title = document.getElementById('title');
+        const content = document.getElementById('content');
+        const emoji = document.getElementById('emoji');
+        const acceptBtn = document.getElementById('acceptBtn');
+        const refuseBtn = document.getElementById('refuseBtn');
+        
+        // 记录拒绝按钮大小
+        let btnSize = 16;
+
+        // 拒绝按钮点击事件
+        refuseBtn.addEventListener('click', () => {
+            // 每次缩小一点
+            btnSize -= 2;
+            if(btnSize < 6) btnSize = 6; // 最小限制
+            refuseBtn.style.fontSize = btnSize + 'px';
+            refuseBtn.style.padding = `${btnSize/1.3}px ${btnSize*1.5}px`;
+
+            // 随机位置
+            const box = document.querySelector('.btn-box');
+            const maxX = box.clientWidth - refuseBtn.clientWidth;
+            const maxY = box.clientHeight - refuseBtn.clientHeight;
+            const randomX = Math.random() * maxX;
+            const randomY = Math.random() * maxY;
+
+            refuseBtn.style.left = randomX + 'px';
+            refuseBtn.style.top = randomY + 'px';
+            refuseBtn.style.right = 'auto';
+        });
+
+        // 接受按钮点击事件
+        acceptBtn.addEventListener('click', () => {
+            // 修改文字
+            title.textContent = '感谢老师';
+            content.textContent = '提前祝老师元旦快乐!';
+            // 修改表情包
+            emoji.textContent = '🥳';
+            // 隐藏拒绝按钮
+            refuseBtn.style.display = 'none';
+            // 修改接受按钮为返回
+            acceptBtn.textContent = '返回';
+            acceptBtn.style.left = '50%';
+            acceptBtn.style.transform = 'translateX(-50%)';
+
+            // 返回按钮功能：刷新页面重置
+            acceptBtn.onclick = () => {
+                location.reload();
+            }
+        });
+    </script>
+</body>
+</html>
