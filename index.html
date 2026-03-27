@@ -2,149 +2,330 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <!-- 核心：适配手机屏幕 -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title>请假申请</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "微软雅黑", sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background-color: #f5f5f5;
-            padding: 20px;
+            background: linear-gradient(135deg, #f0f4f8, #e2e8f0);
+            padding: 25px;
+            overflow-x: hidden;
         }
 
-        /* 文字样式 */
-        .title {
-            font-size: 20px;
-            color: #333;
-            margin-bottom: 15px;
+        .container {
+            width: 100%;
+            max-width: 420px;
+            background: white;
+            border-radius: 24px;
+            padding: 40px 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             text-align: center;
-            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .title {
+            font-size: 22px;
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-weight: 600;
+            line-height: 1.4;
+            transition: all 0.4s ease;
+        }
+
+        /* 动态表情容器 */
+        .emoji-box {
+            width: 140px;
+            height: 140px;
+            margin: 30px auto;
+            position: relative;
+            user-select: none;
+        }
+
+        .face {
+            width: 100%;
+            height: 100%;
+            background: #FFE066;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(255, 224, 102, 0.4);
+        }
+
+        .eye {
+            width: 22px;
+            height: 28px;
+            background: #2d3748;
+            border-radius: 50%;
+            position: absolute;
+            top: 45px;
+            transition: transform 0.12s ease;
+        }
+
+        .eye.left {
+            left: 38px;
+        }
+
+        .eye.right {
+            right: 38px;
+        }
+
+        /* ================================== */
+        /* 核心：超级顺滑嘴型动画（完美版） */
+        /* ================================== */
+        .mouth {
+            position: absolute;
+            bottom: 35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 20px;
+            border-radius: 50%;
+            background: transparent;
+            
+            /* 唯一过渡：所有属性平滑变化 */
+            transition: all 0.5s cubic-bezier(0.44, 0.86, 0.56, 0.96);
+        }
+
+        /* 开心微笑（下弯） */
+        .mouth.happy {
+            border-bottom: 5px solid #2d3748;
+            border-top: 0;
+            height: 24px;
+            width: 50px;
+        }
+
+        /* 平静中性（扁平直线） */
+        .mouth.neutral {
+            border-bottom: 4px solid #2d3748;
+            border-top: 0;
+            height: 1px;
+            width: 32px;
+        }
+
+        /* 伤心委屈（上弯） */
+        .mouth.sad {
+            border-top: 5px solid #2d3748;
+            border-bottom: 0;
+            height: 18px;
+            width: 36px;
         }
 
         .content {
-            font-size: 18px;
-            color: #555;
-            margin-bottom: 30px;
-            text-align: center;
+            font-size: 19px;
+            color: #4a5568;
+            margin-bottom: 40px;
+            line-height: 1.5;
+            transition: all 0.4s ease;
         }
 
-        /* 表情包 */
-        .emoji {
-            font-size: 60px;
-            margin: 20px 0;
-        }
-
-        /* 按钮容器 */
-        .btn-box {
-            display: flex;
-            gap: 20px;
+        .btn-group {
             position: relative;
             width: 100%;
-            max-width: 300px;
-            height: 100px;
+            height: 120px;
+            display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* 接受按钮 */
-        #acceptBtn {
-            padding: 12px 25px;
-            background-color: #4CAF50;
-            color: white;
+        .btn {
+            padding: 14px 32px;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 17px;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            outline: none;
             position: absolute;
-            left: 0;
+            white-space: nowrap;
+            -webkit-user-select: none;
+            user-select: none;
         }
 
-        /* 拒绝按钮 */
-        #refuseBtn {
-            padding: 12px 25px;
-            background-color: #f44336;
+        .accept-btn {
+            background: linear-gradient(135deg, #48bb78, #38a169);
             color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            position: absolute;
+            left: 0;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+        }
+
+        .accept-btn:active {
+            transform: scale(0.95);
+        }
+
+        .refuse-btn {
+            background: linear-gradient(135deg, #f56565, #e53e3e);
+            color: white;
             right: 0;
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);
+        }
+
+        .success-animation {
+            transform: scale(1.03);
+        }
+
+        .final-emoji {
+            font-size: 70px;
+            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="title" id="title">你的愚蠢大学生向你发送了一封请假申请</div>
-    <div class="emoji" id="emoji">🥺</div>
-    <div class="content" id="content">你的学生向你发出一份请假申请，是否接受</div>
+    <div class="container">
+        <div class="title" id="title">你的愚蠢大学生向你发送了一封请假申请</div>
+        
+        <div class="emoji-box" id="emojiBox">
+            <div class="face">
+                <div class="eye left"></div>
+                <div class="eye right"></div>
+                <div class="mouth neutral" id="mouth"></div>
+            </div>
+            <div class="final-emoji" id="finalEmoji">🥳</div>
+        </div>
 
-    <div class="btn-box">
-        <button id="acceptBtn">接受</button>
-        <button id="refuseBtn">拒绝</button>
+        <div class="content" id="content">你的学生向你发出一份请假申请，是否接受</div>
+
+        <div class="btn-group">
+            <button class="btn accept-btn" id="acceptBtn">接受</button>
+            <button class="btn refuse-btn" id="refuseBtn">拒绝</button>
+        </div>
     </div>
 
     <script>
-        // 获取元素
-        const title = document.getElementById('title');
-        const content = document.getElementById('content');
-        const emoji = document.getElementById('emoji');
-        const acceptBtn = document.getElementById('acceptBtn');
-        const refuseBtn = document.getElementById('refuseBtn');
-        
-        // 记录拒绝按钮大小
-        let btnSize = 16;
+        var title = document.getElementById('title');
+        var content = document.getElementById('content');
+        var acceptBtn = document.getElementById('acceptBtn');
+        var refuseBtn = document.getElementById('refuseBtn');
+        var container = document.querySelector('.container');
+        var btnGroup = document.querySelector('.btn-group');
+        var mouth = document.getElementById('mouth');
+        var finalEmoji = document.getElementById('finalEmoji');
+        var eyes = document.querySelectorAll('.eye');
 
-        // 拒绝按钮点击事件
-        refuseBtn.addEventListener('click', () => {
-            // 每次缩小一点
-            btnSize -= 2;
-            if(btnSize < 6) btnSize = 6; // 最小限制
-            refuseBtn.style.fontSize = btnSize + 'px';
-            refuseBtn.style.padding = `${btnSize/1.3}px ${btnSize*1.5}px`;
+        var refuseFontSize = 17;
+        var clickCount = 0;
+        var isAccepted = false;
 
-            // 随机位置
-            const box = document.querySelector('.btn-box');
-            const maxX = box.clientWidth - refuseBtn.clientWidth;
-            const maxY = box.clientHeight - refuseBtn.clientHeight;
-            const randomX = Math.random() * maxX;
-            const randomY = Math.random() * maxY;
+        // 眼睛跟随鼠标
+        document.addEventListener('mousemove', function(e) {
+            if(isAccepted) return;
+            var x = (e.clientX / window.innerWidth - 0.5) * 12;
+            var y = (e.clientY / window.innerHeight - 0.5) * 12;
+            eyes.forEach(eye => {
+                eye.style.transform = `translate(${x}px, ${y}px)`;
+            });
+        });
+
+        // 手机触摸跟随
+        document.addEventListener('touchmove', function(e) {
+            if(isAccepted) return;
+            var touch = e.touches[0];
+            var x = (touch.clientX / window.innerWidth - 0.5) * 12;
+            var y = (touch.clientY / window.innerHeight - 0.5) * 12;
+            eyes.forEach(eye => {
+                eye.style.transform = `translate(${x}px, ${y}px)`;
+            });
+        });
+
+        // 顺滑嘴型切换（真正平滑过渡）
+        let lastMood = 'neutral';
+        document.addEventListener('mousemove', checkMood);
+        document.addEventListener('touchmove', checkMood);
+
+        function checkMood(e) {
+            if(isAccepted) return;
+            var acceptRect = acceptBtn.getBoundingClientRect();
+            var refuseRect = refuseBtn.getBoundingClientRect();
+            var mouseX = e.clientX || (e.touches && e.touches[0].clientX);
+
+            var distAccept = Math.abs(mouseX - (acceptRect.left + acceptRect.width/2));
+            var distRefuse = Math.abs(mouseX - (refuseRect.left + refuseRect.width/2));
+
+            if (distAccept < distRefuse) {
+                if (lastMood !== 'happy') {
+                    mouth.className = 'mouth happy';
+                    lastMood = 'happy';
+                }
+            } else {
+                if (lastMood !== 'sad') {
+                    mouth.className = 'mouth sad';
+                    lastMood = 'sad';
+                }
+            }
+        }
+
+        // 拒绝按钮功能
+        function onRefuseClick() {
+            if(isAccepted) return;
+            clickCount++;
+            refuseFontSize = Math.max(8, refuseFontSize - 1.5);
+
+            refuseBtn.style.fontSize = refuseFontSize + 'px';
+            refuseBtn.style.padding = (refuseFontSize * 0.6) + 'px ' + (refuseFontSize * 1.4) + 'px';
+
+            var maxX = btnGroup.clientWidth - refuseBtn.offsetWidth;
+            var maxY = btnGroup.clientHeight - refuseBtn.offsetHeight;
+            var randomX = Math.random() * maxX;
+            var randomY = Math.random() * maxY;
+            var randomRotate = Math.random() * 20 - 10;
 
             refuseBtn.style.left = randomX + 'px';
             refuseBtn.style.top = randomY + 'px';
             refuseBtn.style.right = 'auto';
-        });
+            refuseBtn.style.transform = 'rotate(' + randomRotate + 'deg)';
+        }
 
-        // 接受按钮点击事件
-        acceptBtn.addEventListener('click', () => {
-            // 修改文字
+        // 接受按钮功能
+        function onAcceptClick() {
+            if(isAccepted) return;
+            isAccepted = true;
+
             title.textContent = '感谢老师';
             content.textContent = '提前祝老师元旦快乐!';
-            // 修改表情包
-            emoji.textContent = '🥳';
-            // 隐藏拒绝按钮
+            
+            emojiBox.querySelector('.face').style.display = 'none';
+            finalEmoji.style.display = 'block';
+            
+            container.classList.add('success-animation');
             refuseBtn.style.display = 'none';
-            // 修改接受按钮为返回
+
             acceptBtn.textContent = '返回';
             acceptBtn.style.left = '50%';
             acceptBtn.style.transform = 'translateX(-50%)';
+            acceptBtn.onclick = resetPage;
+        }
 
-            // 返回按钮功能：刷新页面重置
-            acceptBtn.onclick = () => {
-                location.reload();
-            }
-        });
+        function resetPage() {
+            location.reload();
+        }
+
+        // 兼容事件绑定
+        if(refuseBtn.addEventListener) {
+            refuseBtn.addEventListener('click', onRefuseClick);
+            acceptBtn.addEventListener('click', onAcceptClick);
+        } else if(refuseBtn.attachEvent) {
+            refuseBtn.attachEvent('onclick', onRefuseClick);
+            acceptBtn.attachEvent('onclick', onAcceptClick);
+        }
+
+        document.addEventListener('touchstart', function(e){
+            if(e.touches.length > 1) e.preventDefault();
+        }, {passive: false});
     </script>
 </body>
 </html>
