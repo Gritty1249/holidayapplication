@@ -1,331 +1,696 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>请假申请</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>色差侦探 | 渐进挑战·找出色差方块</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            user-select: none;
             -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
             min-height: 100vh;
+            background: linear-gradient(145deg, #0a0e1a 0%, #05080f 100%);
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #f0f4f8, #e2e8f0);
-            padding: 25px;
-            overflow-x: hidden;
+            align-items: center;
+            font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
+            padding: 20px;
+            touch-action: manipulation;
         }
 
-        .container {
-            width: 100%;
-            max-width: 420px;
-            background: white;
-            border-radius: 24px;
-            padding: 40px 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        .game-wrapper {
+            background: #0f1320;
+            padding: 24px 20px 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 24px;
+            padding: 0 4px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .score-area,
+        .level-area,
+        .best-area {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 18px;
+            border: 1px solid rgba(255, 200, 100, 0.4);
+            flex: 1;
+            min-width: 90px;
             text-align: center;
-            transition: all 0.3s ease;
         }
 
-        .title {
-            font-size: 22px;
-            color: #2d3748;
-            margin-bottom: 20px;
-            font-weight: 600;
-            line-height: 1.4;
-            transition: all 0.4s ease;
+        .score-label,
+        .level-label,
+        .best-label {
+            font-size: 0.7rem;
+            color: #9aaec7;
+            letter-spacing: 1px;
         }
 
-        /* 动态表情容器 */
-        .emoji-box {
-            width: 140px;
-            height: 140px;
-            margin: 30px auto;
-            position: relative;
-            user-select: none;
+        .score-value,
+        .level-value,
+        .best-value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            line-height: 1;
+            color: #f5e56b;
         }
 
-        .face {
-            width: 100%;
-            height: 100%;
-            background: #FFE066;
-            border-radius: 50%;
-            position: relative;
-            display: flex;
+        .best-value {
+            color: #7bc5ff;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+            justify-items: center;
             align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 15px rgba(255, 224, 102, 0.4);
         }
 
-        .eye {
-            width: 22px;
-            height: 28px;
-            background: #2d3748;
-            border-radius: 50%;
-            position: absolute;
-            top: 45px;
-            transition: transform 0.12s ease;
-        }
-
-        .eye.left {
-            left: 38px;
-        }
-
-        .eye.right {
-            right: 38px;
-        }
-
-        /* ================================== */
-        /* 核心：超级顺滑嘴型动画（完美版） */
-        /* ================================== */
-        .mouth {
-            position: absolute;
-            bottom: 35px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 40px;
-            height: 20px;
-            border-radius: 50%;
-            background: transparent;
-            
-            /* 唯一过渡：所有属性平滑变化 */
-            transition: all 0.5s cubic-bezier(0.44, 0.86, 0.56, 0.96);
-        }
-
-        /* 开心微笑（下弯） */
-        .mouth.happy {
-            border-bottom: 5px solid #2d3748;
-            border-top: 0;
-            height: 24px;
-            width: 50px;
-        }
-
-        /* 平静中性（扁平直线） */
-        .mouth.neutral {
-            border-bottom: 4px solid #2d3748;
-            border-top: 0;
-            height: 1px;
-            width: 32px;
-        }
-
-        /* 伤心委屈（上弯） */
-        .mouth.sad {
-            border-top: 5px solid #2d3748;
-            border-bottom: 0;
-            height: 18px;
-            width: 36px;
-        }
-
-        .content {
-            font-size: 19px;
-            color: #4a5568;
-            margin-bottom: 40px;
-            line-height: 1.5;
-            transition: all 0.4s ease;
-        }
-
-        .btn-group {
-            position: relative;
+        .color-block {
             width: 100%;
-            height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn {
-            padding: 14px 32px;
-            border: none;
-            border-radius: 12px;
-            font-size: 17px;
-            font-weight: 500;
+            aspect-ratio: 1 / 1;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            outline: none;
-            position: absolute;
-            white-space: nowrap;
-            -webkit-user-select: none;
-            user-select: none;
+            transition: all 0.1s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        .accept-btn {
-            background: linear-gradient(135deg, #48bb78, #38a169);
+        .color-block:active {
+            transform: scale(0.96);
+        }
+
+        .feedback {
+            text-align: center;
+            margin: 20px 0 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            transition: all 0.2s;
+            border-left: 4px solid #ffb347;
+            color: #e0e5f0;
+        }
+
+        .feedback.success {
+            background: rgba(76, 175, 80, 0.25);
+            border-left-color: #4caf50;
+            color: #a5ffb0;
+        }
+
+        .feedback.error {
+            background: rgba(244, 67, 54, 0.25);
+            border-left-color: #f44336;
+            color: #ffb5aa;
+        }
+
+        .feedback.info {
+            border-left-color: #ffb347;
+            color: #b8cdff;
+        }
+
+        .button-area {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 16px;
+        }
+
+        .game-btn {
+            background: #2a3a55;
+            border: none;
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: 600;
             color: white;
-            left: 0;
-            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 0 3px 0 #1a2538;
         }
 
-        .accept-btn:active {
-            transform: scale(0.95);
+        .game-btn:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 0 #1a2538;
         }
 
-        .refuse-btn {
-            background: linear-gradient(135deg, #f56565, #e53e3e);
-            color: white;
-            right: 0;
-            box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);
+        .game-btn.reset-btn {
+            background: #6a4e3a;
+            box-shadow: 0 3px 0 #553a2a;
         }
 
-        .success-animation {
-            transform: scale(1.03);
+        .difficulty-selector {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
         }
 
-        .final-emoji {
-            font-size: 70px;
-            display: none;
+        .difficulty-btn {
+            background: #1e2a3a;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #aabbdd;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="title" id="title">你的愚蠢大学生向你发送了一封请假申请</div>
-        
-        <div class="emoji-box" id="emojiBox">
-            <div class="face">
-                <div class="eye left"></div>
-                <div class="eye right"></div>
-                <div class="mouth neutral" id="mouth"></div>
-            </div>
-            <div class="final-emoji" id="finalEmoji">🥳</div>
-        </div>
 
-        <div class="content" id="content">你的学生向你发出一份请假申请，是否接受</div>
+        .difficulty-btn.active {
+            background: #ffb347;
+            color: #1e2a3a;
+            border-color: #ffd966;
+            box-shadow: 0 0 12px rgba(255, 180, 70, 0.5);
+        }
 
-        <div class="btn-group">
-            <button class="btn accept-btn" id="acceptBtn">接受</button>
-            <button class="btn refuse-btn" id="refuseBtn">拒绝</button>
-        </div>
-    </div>
+        .round-indicator {
+            text-align: center;
+            font-size: 0.75rem;
+            color: #7e95c0;
+            margin-top: 12px;
+            letter-spacing: 1px;
+        }
 
-    <script>
-        var title = document.getElementById('title');
-        var content = document.getElementById('content');
-        var acceptBtn = document.getElementById('acceptBtn');
-        var refuseBtn = document.getElementById('refuseBtn');
-        var container = document.querySelector('.container');
-        var btnGroup = document.querySelector('.btn-group');
-        var mouth = document.getElementById('mouth');
-        var finalEmoji = document.getElementById('finalEmoji');
-        var eyes = document.querySelectorAll('.eye');
+        @keyframes pulse {
 
-        var refuseFontSize = 17;
-        var clickCount = 0;
-        var isAccepted = false;
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
 
-        // 眼睛跟随鼠标
-        document.addEventListener('mousemove', function(e) {
-            if(isAccepted) return;
-            var x = (e.clientX / window.innerWidth - 0.5) * 12;
-            var y = (e.clientY / window.innerHeight - 0.5) * 12;
-            eyes.forEach(eye => {
-                eye.style.transform = `translate(${x}px, ${y}px)`;
-            });
-        });
-
-        // 手机触摸跟随
-        document.addEventListener('touchmove', function(e) {
-            if(isAccepted) return;
-            var touch = e.touches[0];
-            var x = (touch.clientX / window.innerWidth - 0.5) * 12;
-            var y = (touch.clientY / window.innerHeight - 0.5) * 12;
-            eyes.forEach(eye => {
-                eye.style.transform = `translate(${x}px, ${y}px)`;
-            });
-        });
-
-        // 顺滑嘴型切换（真正平滑过渡）
-        let lastMood = 'neutral';
-        document.addEventListener('mousemove', checkMood);
-        document.addEventListener('touchmove', checkMood);
-
-        function checkMood(e) {
-            if(isAccepted) return;
-            var acceptRect = acceptBtn.getBoundingClientRect();
-            var refuseRect = refuseBtn.getBoundingClientRect();
-            var mouseX = e.clientX || (e.touches && e.touches[0].clientX);
-
-            var distAccept = Math.abs(mouseX - (acceptRect.left + acceptRect.width/2));
-            var distRefuse = Math.abs(mouseX - (refuseRect.left + refuseRect.width/2));
-
-            if (distAccept < distRefuse) {
-                if (lastMood !== 'happy') {
-                    mouth.className = 'mouth happy';
-                    lastMood = 'happy';
-                }
-            } else {
-                if (lastMood !== 'sad') {
-                    mouth.className = 'mouth sad';
-                    lastMood = 'sad';
-                }
+            50% {
+                transform: scale(1.02);
+                opacity: 0.9;
             }
         }
 
-        // 拒绝按钮功能
-        function onRefuseClick() {
-            if(isAccepted) return;
-            clickCount++;
-            refuseFontSize = Math.max(8, refuseFontSize - 1.5);
-
-            refuseBtn.style.fontSize = refuseFontSize + 'px';
-            refuseBtn.style.padding = (refuseFontSize * 0.6) + 'px ' + (refuseFontSize * 1.4) + 'px';
-
-            var maxX = btnGroup.clientWidth - refuseBtn.offsetWidth;
-            var maxY = btnGroup.clientHeight - refuseBtn.offsetHeight;
-            var randomX = Math.random() * maxX;
-            var randomY = Math.random() * maxY;
-            var randomRotate = Math.random() * 20 - 10;
-
-            refuseBtn.style.left = randomX + 'px';
-            refuseBtn.style.top = randomY + 'px';
-            refuseBtn.style.right = 'auto';
-            refuseBtn.style.transform = 'rotate(' + randomRotate + 'deg)';
+        .highlight {
+            animation: pulse 0.2s ease;
         }
 
-        // 接受按钮功能
-        function onAcceptClick() {
-            if(isAccepted) return;
-            isAccepted = true;
+        @media (max-width: 450px) {
+            .grid-container {
+                gap: 10px;
+            }
 
-            title.textContent = '感谢老师';
-            content.textContent = '提前祝老师元旦快乐!';
-            
-            emojiBox.querySelector('.face').style.display = 'none';
-            finalEmoji.style.display = 'block';
-            
-            container.classList.add('success-animation');
-            refuseBtn.style.display = 'none';
+            .score-value,
+            .level-value,
+            .best-value {
+                font-size: 1.3rem;
+            }
 
-            acceptBtn.textContent = '返回';
-            acceptBtn.style.left = '50%';
-            acceptBtn.style.transform = 'translateX(-50%)';
-            acceptBtn.onclick = resetPage;
+            .game-btn {
+                padding: 10px 22px;
+                font-size: 0.9rem;
+            }
+
+            .score-area,
+            .level-area,
+            .best-area {
+                padding: 6px 12px;
+            }
         }
+    </style>
+</head>
 
-        function resetPage() {
-            location.reload();
-        }
+<body>
+    <div class="game-wrapper">
+        <div class="game-header">
+            <div class="score-area">
+                <div class="score-label">🎯 连对</div>
+                <div class="score-value" id="scoreValue">0</div>
+            </div>
+            <div class="level-area">
+                <div class="level-label">📊 难度</div>
+                <div class="level-value" id="levelValue">普通</div>
+            </div>
+            <div class="best-area">
+                <div class="best-label">🏆 最高连对</div>
+                <div class="best-value" id="bestValue">0</div>
+            </div>
+        </div>
 
-        // 兼容事件绑定
-        if(refuseBtn.addEventListener) {
-            refuseBtn.addEventListener('click', onRefuseClick);
-            acceptBtn.addEventListener('click', onAcceptClick);
-        } else if(refuseBtn.attachEvent) {
-            refuseBtn.attachEvent('onclick', onRefuseClick);
-            acceptBtn.attachEvent('onclick', onAcceptClick);
-        }
+        <div class="difficulty-selector">
+            <button class="difficulty-btn" data-diff="easy">🍃 简单</button>
+            <button class="difficulty-btn active" data-diff="medium">⭐ 普通</button>
+            <button class="difficulty-btn" data-diff="hard">🔥 困难</button>
+            <button class="difficulty-btn" data-diff="extreme">💀 炼狱</button>
+        </div>
 
-        document.addEventListener('touchstart', function(e){
-            if(e.touches.length > 1) e.preventDefault();
-        }, {passive: false});
+        <div class="grid-container" id="gridContainer"></div>
+
+        <div class="feedback info" id="feedbackMsg">🔍 找出颜色不一样的那个方块</div>
+
+        <div class="button-area">
+            <button class="game-btn" id="newGameBtn">✨ 新的一局</button>
+            <button class="game-btn reset-btn" id="resetScoreBtn">🔄 重置纪录</button>
+        </div>
+        <div class="round-indicator" id="roundHint">第 1 回合 · 色差明显</div>
+    </div>
+
+    <script>
+        (function () {
+            // ---------- 游戏配置 ----------
+            const GRID_SIZE = 9;
+            let currentScore = 0;
+            let bestScore = 0;
+            let currentRound = 1;
+            let currentDifficulty = 'medium';
+            let currentBlocks = [];
+            let oddIndex = -1;
+            let canClick = true;
+
+            // 难度基础配置（起始色差较大，容易分辨）
+            const DIFFICULTY_CONFIG = {
+                easy: {
+                    name: '简单',
+                    baseOffset: 38,      // 起始色差偏移38，非常明显
+                    minOffset: 20,       // 最小色差220，仍然容易分辨
+                    description: '起始明显，逐渐变难'
+                },
+                medium: {
+                    name: '普通',
+                    baseOffset: 34,
+                    minOffset: 15,
+                    description: '起始较明显，逐渐精细'
+                },
+                hard: {
+                    name: '困难',
+                    baseOffset: 30,
+                    minOffset: 10,
+                    description: '起始中等，后期极细'
+                },
+                extreme: {
+                    name: '炼狱',
+                    baseOffset: 26,
+                    minOffset: 5,
+                    description: '起始偏小，后期极限'
+                }
+            };
+
+            // 鲜艳彩虹色基础色库
+            const VIBRANT_COLOR_PALETTE = [
+                { r: 255, g: 70, b: 70 },   // 鲜红
+                { r: 255, g: 130, b: 50 },  // 橙红
+                { r: 255, g: 190, b: 40 },  // 金黄
+                { r: 100, g: 220, b: 60 },  // 草绿
+                { r: 60, g: 210, b: 160 },  // 薄荷
+                { r: 50, g: 170, b: 255 },  // 亮蓝
+                { r: 130, g: 90, b: 250 },  // 紫罗兰
+                { r: 255, g: 80, b: 170 },  // 粉红
+                { r: 255, g: 110, b: 120 }, // 珊瑚
+                { r: 70, g: 200, b: 210 },  // 天蓝
+                { r: 255, g: 150, b: 60 },  // 橘黄
+                { r: 200, g: 70, b: 220 },  // 紫色
+                { r: 80, g: 230, b: 100 },  // 翠绿
+                { r: 255, g: 100, b: 90 },  // 西瓜红
+                { r: 255, g: 210, b: 70 },  // 柠檬黄
+            ];
+
+            const DOM = {
+                gridContainer: document.getElementById('gridContainer'),
+                scoreEl: document.getElementById('scoreValue'),
+                bestEl: document.getElementById('bestValue'),
+                levelValueEl: document.getElementById('levelValue'),
+                feedbackMsg: document.getElementById('feedbackMsg'),
+                roundHint: document.getElementById('roundHint'),
+                newGameBtn: document.getElementById('newGameBtn'),
+                resetScoreBtn: document.getElementById('resetScoreBtn'),
+                diffBtns: document.querySelectorAll('.difficulty-btn')
+            };
+
+            // 根据当前连对次数计算实际色差偏移量（动态难度）
+            // 连对越多，色差越小，难度递增
+            function getCurrentOffset() {
+                const config = DIFFICULTY_CONFIG[currentDifficulty];
+                const baseOffset = config.baseOffset;
+                const minOffset = config.minOffset;
+
+                // 每正确3次，色差减少2个单位（平滑递减）
+                // 连对次数越多，色差越小
+                let reduction = Math.floor(currentScore / 3) * 2;
+                let currentOffset = Math.max(minOffset, baseOffset - reduction);
+
+                // 额外：连对次数较多时额外微调，确保逐渐变难但不至于无法分辨
+                if (currentScore > 15) {
+                    currentOffset = Math.max(minOffset, currentOffset - 1);
+                }
+                if (currentScore > 25) {
+                    currentOffset = Math.max(minOffset, currentOffset - 1);
+                }
+
+                return currentOffset;
+            }
+
+            function updateUI() {
+                DOM.scoreEl.innerText = currentScore;
+                DOM.bestEl.innerText = bestScore;
+                DOM.levelValueEl.innerText = DIFFICULTY_CONFIG[currentDifficulty].name;
+                const currentOffset = getCurrentOffset();
+                const offsetDesc = getOffsetDescription(currentOffset);
+                DOM.roundHint.innerText = `第 ${currentRound} 回合 · 色差: ${offsetDesc}`;
+            }
+
+            function getOffsetDescription(offset) {
+                if (offset >= 24) return '非常明显 👁️';
+                if (offset >= 18) return '比较明显 👀';
+                if (offset >= 12) return '中等难度 🎯';
+                if (offset >= 7) return '需要仔细 🔍';
+                if (offset >= 4) return '细微差别 ✨';
+                return '极限挑战 💎';
+            }
+
+            function updateBestIfNeeded() {
+                if (currentScore > bestScore) {
+                    bestScore = currentScore;
+                    DOM.bestEl.innerText = bestScore;
+                    localStorage.setItem('colorDetective_best_v2', bestScore);
+                    DOM.feedbackMsg.innerText = '🎉 新纪录！ 🎉';
+                    DOM.feedbackMsg.className = 'feedback success';
+                    setTimeout(() => {
+                        if (canClick) {
+                            DOM.feedbackMsg.className = 'feedback info';
+                            DOM.feedbackMsg.innerText = '🔍 找出颜色不一样的那个方块';
+                        }
+                    }, 1000);
+                }
+            }
+
+            function loadBestScore() {
+                const saved = localStorage.getItem('colorDetective_best_v2');
+                if (saved && !isNaN(parseInt(saved))) {
+                    bestScore = parseInt(saved);
+                    DOM.bestEl.innerText = bestScore;
+                } else {
+                    bestScore = 0;
+                }
+            }
+
+            function resetBestScore() {
+                bestScore = 0;
+                localStorage.setItem('colorDetective_best_v2', 0);
+                DOM.bestEl.innerText = '0';
+                DOM.feedbackMsg.innerText = '🏆 最高纪录已重置';
+                DOM.feedbackMsg.className = 'feedback info';
+                setTimeout(() => {
+                    if (canClick) {
+                        DOM.feedbackMsg.className = 'feedback info';
+                        DOM.feedbackMsg.innerText = '🔍 找出颜色不一样的那个方块';
+                    }
+                }, 1000);
+            }
+
+            // 获取鲜艳的随机基础色
+            function getRandomVibrantColor() {
+                const paletteIndex = Math.floor(Math.random() * VIBRANT_COLOR_PALETTE.length);
+                const base = VIBRANT_COLOR_PALETTE[paletteIndex];
+                // 轻微扰动让每局颜色不同但依然鲜艳
+                const rVar = Math.floor(Math.random() * 11) - 5;
+                const gVar = Math.floor(Math.random() * 11) - 5;
+                const bVar = Math.floor(Math.random() * 11) - 5;
+                return {
+                    r: Math.min(255, Math.max(50, base.r + rVar)),
+                    g: Math.min(255, Math.max(50, base.g + gVar)),
+                    b: Math.min(255, Math.max(50, base.b + bVar))
+                };
+            }
+
+            // 根据当前偏移量生成异色（动态难度）
+            function generateOddColor(baseRgb, offset) {
+                let r = baseRgb.r;
+                let g = baseRgb.g;
+                let b = baseRgb.b;
+
+                // 偏移策略：确保色差可控但可辨
+                // 使用多模式让颜色变化自然
+                const mode = Math.floor(Math.random() * 3);
+
+                if (mode === 0) {
+                    // 单通道偏移
+                    const channel = Math.floor(Math.random() * 3);
+                    const delta = (Math.random() > 0.5 ? offset : -offset);
+                    if (channel === 0) r = Math.min(255, Math.max(30, r + delta));
+                    else if (channel === 1) g = Math.min(255, Math.max(30, g + delta));
+                    else b = Math.min(255, Math.max(30, b + delta));
+                } else if (mode === 1) {
+                    // 双通道偏移
+                    const delta1 = (Math.random() > 0.5 ? offset : -offset);
+                    const delta2 = (Math.random() > 0.5 ? offset : -offset);
+                    r = Math.min(255, Math.max(30, r + delta1));
+                    g = Math.min(255, Math.max(30, g + delta2));
+                    // 第三通道微小调整
+                    const smallShift = Math.floor(offset * 0.5);
+                    if (smallShift > 0) {
+                        b = Math.min(255, Math.max(30, b + (Math.random() > 0.5 ? smallShift : -smallShift)));
+                    }
+                } else {
+                    // 三通道均匀微调
+                    const deltaR = (Math.random() > 0.5 ? offset : -offset);
+                    const deltaG = (Math.random() > 0.5 ? offset : -offset);
+                    const deltaB = (Math.random() > 0.5 ? offset : -offset);
+                    r = Math.min(255, Math.max(30, r + deltaR));
+                    g = Math.min(255, Math.max(30, g + deltaG));
+                    b = Math.min(255, Math.max(30, b + deltaB));
+                }
+
+                // 确保异色与基础色不完全相同
+                if (r === baseRgb.r && g === baseRgb.g && b === baseRgb.b) {
+                    r = Math.min(255, Math.max(30, r + offset));
+                    g = Math.min(255, Math.max(30, g + (Math.random() > 0.5 ? offset : -offset)));
+                }
+
+                // 保持鲜艳度：确保至少有一个通道大于150
+                const maxVal = Math.max(r, g, b);
+                if (maxVal < 140) {
+                    if (r === maxVal) r = Math.min(255, r + 35);
+                    else if (g === maxVal) g = Math.min(255, g + 35);
+                    else b = Math.min(255, b + 35);
+                }
+
+                return { r, g, b };
+            }
+
+            function rgbToCss(rgb) {
+                return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+            }
+
+            // 生成一回合的数据
+            function generateRound() {
+                const currentOffset = getCurrentOffset();  // 动态难度核心
+                const baseColorObj = getRandomVibrantColor();
+                const oddColorObj = generateOddColor(baseColorObj, currentOffset);
+
+                const oddIdx = Math.floor(Math.random() * GRID_SIZE);
+
+                const blocks = [];
+                for (let i = 0; i < GRID_SIZE; i++) {
+                    if (i === oddIdx) {
+                        blocks.push(rgbToCss(oddColorObj));
+                    } else {
+                        blocks.push(rgbToCss(baseColorObj));
+                    }
+                }
+
+                return { blocks, oddIndex: oddIdx };
+            }
+
+            function renderGrid(blocks) {
+                DOM.gridContainer.innerHTML = '';
+                for (let i = 0; i < blocks.length; i++) {
+                    const block = document.createElement('div');
+                    block.className = 'color-block';
+                    block.style.backgroundColor = blocks[i];
+                    block.setAttribute('data-index', i);
+                    block.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (!canClick) return;
+                        const idx = parseInt(block.getAttribute('data-index'));
+                        handleBlockClick(idx);
+                    });
+                    DOM.gridContainer.appendChild(block);
+                }
+            }
+
+            function handleBlockClick(clickedIdx) {
+                if (!canClick) return;
+
+                if (clickedIdx === oddIndex) {
+                    // 正确！
+                    currentScore++;
+                    currentRound++;
+                    updateUI();
+                    updateBestIfNeeded();
+
+                    // 显示当前难度信息
+                    const currentOffset = getCurrentOffset();
+                    DOM.feedbackMsg.innerHTML = `✅ 正确！ +1分 (色差: ${getOffsetDescription(currentOffset)})`;
+                    DOM.feedbackMsg.className = 'feedback success';
+
+                    const blocksDom = document.querySelectorAll('.color-block');
+                    if (blocksDom[clickedIdx]) {
+                        blocksDom[clickedIdx].classList.add('highlight');
+                        setTimeout(() => blocksDom[clickedIdx].classList.remove('highlight'), 250);
+                    }
+
+                    canClick = false;
+                    setTimeout(() => {
+                        generateNewRound();
+                        canClick = true;
+                    }, 500);
+                } else {
+                    // 错误：连胜重置
+                    const currentOffset = getCurrentOffset();
+                    DOM.feedbackMsg.innerHTML = `❌ 错误！ 正确答案是第 ${oddIndex + 1} 号。连胜重置 (当前色差: ${getOffsetDescription(currentOffset)})`;
+                    DOM.feedbackMsg.className = 'feedback error';
+
+                    const blocksDom = document.querySelectorAll('.color-block');
+                    // 高亮错误方块
+                    if (blocksDom[clickedIdx]) {
+                        const originalBg = blocksDom[clickedIdx].style.backgroundColor;
+                        blocksDom[clickedIdx].style.transition = '0.1s';
+                        blocksDom[clickedIdx].style.backgroundColor = '#ff8888';
+                        setTimeout(() => {
+                            blocksDom[clickedIdx].style.backgroundColor = originalBg;
+                            blocksDom[clickedIdx].style.transition = '';
+                        }, 300);
+                    }
+                    // 高亮正确方块
+                    if (blocksDom[oddIndex]) {
+                        const correctOriginal = blocksDom[oddIndex].style.backgroundColor;
+                        blocksDom[oddIndex].style.backgroundColor = '#88ff88';
+                        setTimeout(() => {
+                            blocksDom[oddIndex].style.backgroundColor = correctOriginal;
+                        }, 800);
+                    }
+
+                    canClick = false;
+                    setTimeout(() => {
+                        currentScore = 0;
+                        currentRound = 1;
+                        updateUI();
+                        generateNewRound();
+                        canClick = true;
+                        setTimeout(() => {
+                            if (DOM.feedbackMsg.className !== 'feedback info') {
+                                DOM.feedbackMsg.className = 'feedback info';
+                                DOM.feedbackMsg.innerText = '🔍 找出颜色不一样的那个方块';
+                            }
+                        }, 1200);
+                    }, 1500);
+                }
+            }
+
+            function fullResetGame() {
+                currentScore = 0;
+                currentRound = 1;
+                updateUI();
+                generateNewRound();
+                DOM.feedbackMsg.innerText = '✨ 新的一局！从明显色差开始，连对越多越难 ✨';
+                DOM.feedbackMsg.className = 'feedback info';
+                setTimeout(() => {
+                    if (canClick) {
+                        DOM.feedbackMsg.className = 'feedback info';
+                        DOM.feedbackMsg.innerText = '🔍 找出颜色不一样的那个方块';
+                    }
+                }, 1800);
+            }
+
+            function generateNewRound() {
+                const { blocks, oddIndex: newOddIdx } = generateRound();
+                currentBlocks = blocks;
+                oddIndex = newOddIdx;
+                renderGrid(currentBlocks);
+                canClick = true;
+                const currentOffset = getCurrentOffset();
+                DOM.roundHint.innerText = `第 ${currentRound} 回合 · 色差: ${getOffsetDescription(currentOffset)}`;
+            }
+
+            function setDifficulty(level) {
+                if (!DIFFICULTY_CONFIG[level]) return;
+                currentDifficulty = level;
+
+                DOM.diffBtns.forEach(btn => {
+                    if (btn.getAttribute('data-diff') === level) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+
+                // 切换难度时重置游戏进度（保持最高分）
+                currentScore = 0;
+                currentRound = 1;
+                updateUI();
+                generateNewRound();
+
+                const config = DIFFICULTY_CONFIG[level];
+                DOM.feedbackMsg.innerText = `切换到「${config.name}」难度 · 起始色差较大，连对后逐渐变难`;
+                DOM.feedbackMsg.className = 'feedback info';
+                setTimeout(() => {
+                    if (canClick) {
+                        DOM.feedbackMsg.className = 'feedback info';
+                        DOM.feedbackMsg.innerText = '🔍 找出颜色不一样的那个方块';
+                    }
+                }, 2000);
+            }
+
+            // 初始化
+            function init() {
+                loadBestScore();
+                currentDifficulty = 'medium';
+                setDifficulty('medium');
+
+                DOM.newGameBtn.addEventListener('click', () => {
+                    fullResetGame();
+                });
+
+                DOM.resetScoreBtn.addEventListener('click', () => {
+                    resetBestScore();
+                    currentScore = 0;
+                    currentRound = 1;
+                    updateUI();
+                    generateNewRound();
+                    DOM.feedbackMsg.innerText = '纪录已重置，继续挑战吧！';
+                    DOM.feedbackMsg.className = 'feedback info';
+                    setTimeout(() => {
+                        if (canClick) {
+                            DOM.feedbackMsg.className = 'feedback info';
+                            DOM.feedbackMsg.innerText = '🔍 找出颜色不一样的那个方块';
+                        }
+                    }, 1200);
+                });
+
+                DOM.diffBtns.forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const diff = btn.getAttribute('data-diff');
+                        if (diff === currentDifficulty) return;
+                        setDifficulty(diff);
+                    });
+                });
+            }
+
+            init();
+        })();
     </script>
 </body>
+
 </html>
