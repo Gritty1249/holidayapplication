@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-<title>请假条</title>
+<title>搞怪请假条</title>
 <style>
 * {
   margin:0;
@@ -245,7 +245,7 @@ body {
   background: #e0e6f5;
 }
 
-/* 模态框样式 */
+/* 模态框样式 - 修复溢出问题 */
 .modal-mask {
   position: fixed;
   top: 0;
@@ -268,12 +268,13 @@ body {
 }
 .modal-container {
   background: white;
-  width: 85%;
+  width: 90%;
   max-width: 360px;
   border-radius: 32px;
-  padding: 28px 24px 32px;
+  padding: 28px 20px 32px;
   text-align: center;
   box-shadow: 0 30px 50px rgba(0,0,0,0.3);
+  box-sizing: border-box;
 }
 .modal-container h3 {
   font-size: 1.6rem;
@@ -289,12 +290,29 @@ body {
   font-size: 1rem;
   font-family: inherit;
   background: #fefeff;
+  box-sizing: border-box;
 }
-.modal-input:focus {
+/* 事由输入框 - 防止溢出屏幕，限制最大宽度 */
+.modal-textarea {
+  width: 100%;
+  max-width: 100%;
+  padding: 14px 16px;
+  margin: 10px 0;
+  border: 1px solid #ccd9f0;
+  border-radius: 24px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: #fefeff;
+  resize: vertical;
+  box-sizing: border-box;
+  min-height: 80px;
+  max-height: 150px;
+}
+.modal-input:focus, .modal-textarea:focus {
   outline: none;
   border-color: #63b36b;
 }
-/* 日期输入框特殊样式 - 移动端友好 */
+/* 日期输入框特殊样式 */
 input[type="date"] {
   appearance: none;
   -webkit-appearance: none;
@@ -305,6 +323,7 @@ input[type="date"] {
   gap: 15px;
   margin-top: 20px;
   justify-content: center;
+  flex-wrap: wrap;
 }
 .modal-btn {
   background: #eef2ff;
@@ -314,6 +333,8 @@ input[type="date"] {
   font-weight: 600;
   cursor: pointer;
   font-size: 1rem;
+  flex: 1;
+  min-width: 100px;
 }
 .modal-btn.confirm {
   background: #2c7a4d;
@@ -327,7 +348,7 @@ input[type="date"] {
 
 <div class="card" id="card">
   <h1>您的憨憨大学生向你发送了一封请假申请</h1>
-  <p>您是否接受？</p>
+  <p>您的学生向你发出一份请假申请，是否接受？</p>
   <div class="face" id="face">
     <div class="eye-container left"><div class="eye left-eye"></div></div>
     <div class="eye-container right"><div class="eye right-eye"></div></div>
@@ -345,13 +366,13 @@ input[type="date"] {
   </div>
 </div>
 
-<!-- 编辑模态框 -->
+<!-- 编辑模态框 - 使用textarea防止溢出 -->
 <div id="infoModal" class="modal-mask">
   <div class="modal-container">
     <h3>✏️ 编辑请假条</h3>
     <input type="text" id="modalName" class="modal-input" placeholder="学生姓名" autocomplete="off" value="张三">
     <input type="date" id="modalDate" class="modal-input" value="2025-10-06">
-    <textarea id="modalReason" class="modal-input" rows="2" placeholder="请假事由...">家中有事，需要回去处理</textarea>
+    <textarea id="modalReason" class="modal-textarea" rows="2" placeholder="请假事由...">家中有事，需要回去处理</textarea>
     <div class="modal-buttons">
       <button class="modal-btn" id="modalCancelBtn">取消</button>
       <button class="modal-btn confirm" id="modalConfirmBtn">保存</button>
@@ -392,6 +413,7 @@ let currentData = {
 
 // 更新页面显示
 function updateInfoDisplay() {
+  console.log('更新显示:', currentData);
   displayNameSpan.innerText = currentData.name;
   displayDateSpan.innerText = currentData.date;
   displayReasonSpan.innerText = currentData.reason;
@@ -399,6 +421,7 @@ function updateInfoDisplay() {
 
 // 打开编辑弹窗
 function openModal() {
+  // 将当前数据显示到弹窗中
   modalName.value = currentData.name;
   modalDate.value = currentData.date;
   modalReason.value = currentData.reason;
@@ -414,24 +437,37 @@ function closeModal() {
 function saveModalData() {
   let newName = modalName.value.trim();
   if (newName === "") newName = "无名氏";
+  
   let newDate = modalDate.value;
   if (!newDate) {
     const today = new Date();
-    newDate = today.toISOString().split('T')[0];
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    newDate = `${year}-${month}-${day}`;
   }
+  
   let newReason = modalReason.value.trim();
   if (newReason === "") newReason = "（未填写事由）";
   
+  // 更新数据
   currentData = {
     name: newName,
     date: newDate,
     reason: newReason
   };
+  
+  // 更新页面显示
   updateInfoDisplay();
+  
+  // 关闭弹窗
   closeModal();
+  
   // 保存后给个开心的反馈
   setSuperHappy();
   setTimeout(() => setHappy(), 800);
+  
+  console.log('保存成功:', currentData);
 }
 
 // ==================== 表情和嘴巴逻辑 ====================
@@ -577,7 +613,7 @@ decline.addEventListener('click', (e) => {
 // ==================== 接受按钮 ====================
 agree.addEventListener('click', () => {
   setSuperHappy();
-  alert(`已接受！\n姓名：${currentData.name}\n日期：${currentData.date}\n事由：${currentData.reason}`);
+  alert(`✅ 已接受！\n\n📛 姓名：${currentData.name}\n📅 日期：${currentData.date}\n📝 事由：${currentData.reason}`);
 });
 
 // ==================== 编辑功能绑定 ====================
