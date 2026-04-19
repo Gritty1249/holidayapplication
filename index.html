@@ -1,31 +1,646 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        span {
-            color: red;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+<title>请假条</title>
+<style>
+* {
+  margin:0;
+  padding:0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+body {
+  margin:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
+  background:#f5f7fa;
+  font-family:'Microsoft YaHei',sans-serif;
+  padding:20px;
+}
+.card {
+  background:#fff;
+  padding:40px 30px;
+  border-radius:24px;
+  box-shadow:0 8px 30px rgba(0,0,0,0.1);
+  text-align:center;
+  width:800px;
+  max-width:100%;
+  position:relative;
+}
+.face {
+  position: relative;
+  width:150px;
+  height:150px;
+  background:#ffeb99;
+  border-radius:50%;
+  margin:20px auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  transition: background 0.3s;
+}
+.eye-container { position:absolute; width:30px; height:30px; top:45px; border-radius:50%; overflow:hidden; background:#fff; }
+.eye-container.left { left:45px; }
+.eye-container.right { right:45px; }
+.eye { width:15px; height:15px; background:#000; border-radius:50%; position:absolute; top:7.5px; left:7.5px; transition:0.05s linear; }
+.mouth { position:absolute; bottom:25px; width:70px; height:38px; display:flex; justify-content:center; align-items:center; }
+.mouth-inner { width:100%; height:100%; position:relative; display:flex; justify-content:center; align-items:center; }
+
+/* 开心嘴巴样式 */
+.mouth-open-happy {
+  width: 70px;
+  height: 28px;
+  border: 3px solid #2d2f36;
+  border-top: none;
+  border-radius: 0 0 40px 40px;
+  background: #ff9a9a;
+  position: relative;
+  overflow: visible;
+  animation: talkHappy 0.4s infinite alternate ease;
+  transform-origin: center top;
+}
+.mouth-open-happy .tooth {
+  position: absolute;
+  width: 16px;
+  height: 9px;
+  background: white;
+  border: 1px solid #e0a5a5;
+  border-radius: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  top: -3px;
+  z-index: 2;
+}
+.mouth-open-happy .tongue {
+  position: absolute;
+  width: 28px;
+  height: 12px;
+  background: #ff6b6b;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 4px;
+  border-radius: 8px 8px 0 0;
+}
+
+/* 伤心嘴巴样式 */
+.mouth-open-sad {
+  width: 70px;
+  height: 28px;
+  border: 3px solid #2d2f36;
+  border-bottom: none;
+  border-radius: 40px 40px 0 0;
+  background: #ff9a9a;
+  position: relative;
+  overflow: visible;
+  animation: talkSad 0.4s infinite alternate ease;
+  transform-origin: center bottom;
+}
+.mouth-open-sad .tooth {
+  position: absolute;
+  width: 16px;
+  height: 9px;
+  background: white;
+  border: 1px solid #e0a5a5;
+  border-radius: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -3px;
+  z-index: 2;
+}
+.mouth-open-sad .tongue {
+  position: absolute;
+  width: 28px;
+  height: 12px;
+  background: #ff6b6b;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 8px;
+  border-radius: 0 0 8px 8px;
+}
+
+/* 动画 */
+@keyframes talkHappy {
+  0% { height: 24px; transform: scaleY(0.9); }
+  100% { height: 32px; transform: scaleY(1.1); }
+}
+@keyframes talkSad {
+  0% { height: 24px; transform: scaleY(0.9); }
+  100% { height: 32px; transform: scaleY(1.1); }
+}
+
+.actions {
+  margin-top:24px;
+  position:relative;
+  min-height: 100px;
+  width: 100%;
+}
+.btn {
+  width:120px;
+  height:50px;
+  border:none;
+  border-radius:8px;
+  font-size:18px;
+  font-weight:bold;
+  cursor:pointer;
+  color:#fff;
+  box-shadow:0 4px 12px rgba(0,0,0,0.15);
+  position:absolute;
+  z-index:20;
+  transition: all 0.2s ease;
+}
+#agree {
+  background:linear-gradient(#63b36b,#2e8b57);
+  left:0;
+  top:25px;
+}
+#decline {
+  background:linear-gradient(#f28b82,#d9534f);
+  right:0;
+  top:25px;
+}
+/* 移动端按钮尺寸适配 */
+@media (max-width: 600px) {
+  .btn {
+    width: 110px;
+    height: 48px;
+    font-size: 16px;
+  }
+  .card {
+    padding: 30px 20px;
+  }
+}
+@media (max-width: 480px) {
+  .btn {
+    width: 100px;
+    height: 46px;
+    font-size: 15px;
+  }
+  .face {
+    width: 130px;
+    height: 130px;
+  }
+  .eye-container.left { left: 35px; }
+  .eye-container.right { right: 35px; }
+  .mouth { bottom: 20px; width: 60px; }
+  .mouth-open-happy, .mouth-open-sad { width: 60px; }
+}
+
+.face.happy { background:#ffeb99; }
+.face.superhappy { background:#fff270; }
+.face.sad { background:#ffd699; }
+.face.crying { background:#ffcc99; }
+
+.eye-tear { width:6px; height:10px; background:rgba(0,191,255,0.9); border-radius:50%; position:absolute; z-index:30; pointer-events: none; }
+
+.info {
+  text-align:left;
+  font-size:16px;
+  line-height:1.8;
+  margin:20px auto;
+  max-width:400px;
+  color:#444;
+  background:#f9f9f9;
+  padding:15px 20px;
+  border-radius:16px;
+  position: relative;
+}
+.info div {
+  margin: 8px 0;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.info strong {
+  min-width: 50px;
+}
+.info-value {
+  flex: 1;
+  color: #2c3e66;
+  word-break: break-word;
+}
+.edit-info-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  background: #eef2ff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 40px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #2c3e66;
+  cursor: pointer;
+  transition: 0.1s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.edit-info-btn:active {
+  transform: scale(0.95);
+  background: #e0e6f5;
+}
+
+/* 模态框样式 */
+.modal-mask {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  visibility: hidden;
+  opacity: 0;
+  transition: 0.2s;
+}
+.modal-mask.show {
+  visibility: visible;
+  opacity: 1;
+}
+.modal-container {
+  background: white;
+  width: 85%;
+  max-width: 360px;
+  border-radius: 32px;
+  padding: 28px 24px 32px;
+  text-align: center;
+  box-shadow: 0 30px 50px rgba(0,0,0,0.3);
+}
+.modal-container h3 {
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+  color: #2c3e66;
+}
+.modal-input {
+  width: 100%;
+  padding: 14px 16px;
+  margin: 10px 0;
+  border: 1px solid #ccd9f0;
+  border-radius: 44px;
+  font-size: 1rem;
+  font-family: inherit;
+  background: #fefeff;
+}
+.modal-input:focus {
+  outline: none;
+  border-color: #63b36b;
+}
+/* 日期输入框特殊样式 - 移动端友好 */
+input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+  background: #fefeff;
+}
+.modal-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  justify-content: center;
+}
+.modal-btn {
+  background: #eef2ff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 60px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.modal-btn.confirm {
+  background: #2c7a4d;
+  color: white;
+}
+</style>
 </head>
-
 <body>
-    <a href="https://ys.mihoyo.com/main/"><span>5</span>后自动跳转页面</a>
-    <script>
-        let num = 5
-        let timeId = setInterval(function () {
-            num--
-            const a = document.querySelector('a')
-            a.innerHTML = `<span>${num}</span>后自动跳转首页`
-            if (num === 0) {
-                clearInterval(timeId)
-                location.href = 'https://ys.mihoyo.com/main/'
-            }
-        }, 1000)
-    </script>
-</body>
 
+<audio id="bgmusic" src="http://music.163.com/song/media/outer/url?id=2746941328.mp3" autoplay loop></audio>
+
+<div class="card" id="card">
+  <h1>您的憨憨大学生向你发送了一封请假申请</h1>
+  <p>您是否接受？</p>
+  <div class="face" id="face">
+    <div class="eye-container left"><div class="eye left-eye"></div></div>
+    <div class="eye-container right"><div class="eye right-eye"></div></div>
+    <div class="mouth" id="mouth"><div class="mouth-inner"></div></div>
+  </div>
+  <div class="info" id="infoContainer">
+    <div><strong>姓名：</strong><span class="info-value" id="displayName">张三</span></div>
+    <div><strong>日期：</strong><span class="info-value" id="displayDate">2025-10-06</span></div>
+    <div><strong>事由：</strong><span class="info-value" id="displayReason">家中有事，需要回去处理</span></div>
+    <button class="edit-info-btn" id="editInfoBtn">✏️ 编辑</button>
+  </div>
+  <div class="actions" id="actions">
+    <button id="agree" class="btn">接受</button>
+    <button id="decline" class="btn">拒绝</button>
+  </div>
+</div>
+
+<!-- 编辑模态框 -->
+<div id="infoModal" class="modal-mask">
+  <div class="modal-container">
+    <h3>✏️ 编辑请假条</h3>
+    <input type="text" id="modalName" class="modal-input" placeholder="学生姓名" autocomplete="off" value="张三">
+    <input type="date" id="modalDate" class="modal-input" value="2025-10-06">
+    <textarea id="modalReason" class="modal-input" rows="2" placeholder="请假事由...">家中有事，需要回去处理</textarea>
+    <div class="modal-buttons">
+      <button class="modal-btn" id="modalCancelBtn">取消</button>
+      <button class="modal-btn confirm" id="modalConfirmBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ==================== DOM 元素 ====================
+const face = document.getElementById('face');
+const leftEye = document.querySelector('.left-eye');
+const rightEye = document.querySelector('.right-eye');
+const mouthInner = document.querySelector('.mouth-inner');
+const agree = document.getElementById('agree');
+const decline = document.getElementById('decline');
+const actions = document.getElementById('actions');
+
+// 显示信息的元素
+const displayNameSpan = document.getElementById('displayName');
+const displayDateSpan = document.getElementById('displayDate');
+const displayReasonSpan = document.getElementById('displayReason');
+
+// 编辑相关元素
+const editBtn = document.getElementById('editInfoBtn');
+const modal = document.getElementById('infoModal');
+const modalName = document.getElementById('modalName');
+const modalDate = document.getElementById('modalDate');
+const modalReason = document.getElementById('modalReason');
+const modalCancel = document.getElementById('modalCancelBtn');
+const modalConfirm = document.getElementById('modalConfirmBtn');
+
+// 当前请假数据
+let currentData = {
+  name: '张三',
+  date: '2025-10-06',
+  reason: '家中有事，需要回去处理'
+};
+
+// 更新页面显示
+function updateInfoDisplay() {
+  displayNameSpan.innerText = currentData.name;
+  displayDateSpan.innerText = currentData.date;
+  displayReasonSpan.innerText = currentData.reason;
+}
+
+// 打开编辑弹窗
+function openModal() {
+  modalName.value = currentData.name;
+  modalDate.value = currentData.date;
+  modalReason.value = currentData.reason;
+  modal.classList.add('show');
+}
+
+// 关闭编辑弹窗
+function closeModal() {
+  modal.classList.remove('show');
+}
+
+// 保存编辑内容
+function saveModalData() {
+  let newName = modalName.value.trim();
+  if (newName === "") newName = "无名氏";
+  let newDate = modalDate.value;
+  if (!newDate) {
+    const today = new Date();
+    newDate = today.toISOString().split('T')[0];
+  }
+  let newReason = modalReason.value.trim();
+  if (newReason === "") newReason = "（未填写事由）";
+  
+  currentData = {
+    name: newName,
+    date: newDate,
+    reason: newReason
+  };
+  updateInfoDisplay();
+  closeModal();
+  // 保存后给个开心的反馈
+  setSuperHappy();
+  setTimeout(() => setHappy(), 800);
+}
+
+// ==================== 表情和嘴巴逻辑 ====================
+function forceRedraw(element) {
+  if (!element) return;
+  void element.offsetHeight;
+}
+
+function createHappyMouth() { 
+  mouthInner.innerHTML = `<div class="mouth-open-happy"><div class="tooth"></div><div class="tongue"></div></div>`;
+  forceRedraw(mouthInner);
+}
+function createSadMouth() { 
+  mouthInner.innerHTML = `<div class="mouth-open-sad"><div class="tooth"></div><div class="tongue"></div></div>`;
+  forceRedraw(mouthInner);
+}
+
+function setHappy() { 
+  face.className = 'face happy'; 
+  createHappyMouth(); 
+}
+function setSuperHappy() { 
+  face.className = 'face superhappy'; 
+  createHappyMouth(); 
+}
+function setSad() { 
+  face.className = 'face sad'; 
+  createSadMouth(); 
+}
+
+// ==================== 鼠标/触摸跟随 ====================
+function handlePointerMove(e) {
+  let clientX, clientY;
+  if (e.touches) {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  } else {
+    clientX = e.clientX;
+    clientY = e.clientY;
+  }
+  
+  const rect = face.getBoundingClientRect();
+  const cx = rect.left + rect.width/2;
+  const cy = rect.top + rect.height/2;
+  const dx = Math.max(-5, Math.min(5, (clientX - cx) / 50));
+  const dy = Math.max(-5, Math.min(5, (clientY - cy) / 50));
+  leftEye.style.transform = `translate(${dx}px, ${dy}px)`;
+  rightEye.style.transform = `translate(${dx}px, ${dy}px)`;
+
+  const declineRect = decline.getBoundingClientRect();
+  const agreeRect = agree.getBoundingClientRect();
+  const distDecline = Math.hypot(clientX - (declineRect.left + declineRect.width/2), clientY - (declineRect.top + declineRect.height/2));
+  const distAgree = Math.hypot(clientX - (agreeRect.left + agreeRect.width/2), clientY - (agreeRect.top + agreeRect.height/2));
+  
+  if(distDecline < 130) {
+    if (face.className !== 'face sad') setSad();
+  } else if(distAgree < 130) {
+    if (face.className !== 'face superhappy') setSuperHappy();
+  } else {
+    if (face.className !== 'face happy' && face.className !== 'face') setHappy();
+  }
+}
+
+document.addEventListener('mousemove', handlePointerMove);
+document.addEventListener('touchmove', handlePointerMove, { passive: false });
+
+// ==================== 眼泪特效 ====================
+function createEyeTearsBothEyes() {
+  const leftEyeContainer = document.querySelector('.eye-container.left');
+  const rightEyeContainer = document.querySelector('.eye-container.right');
+  const eyes = [leftEyeContainer, rightEyeContainer];
+  
+  eyes.forEach(eyeContainer => {
+    if (!eyeContainer) return;
+    const rect = eyeContainer.getBoundingClientRect();
+    const faceRect = face.getBoundingClientRect();
+    const startX = rect.left - faceRect.left + rect.width/2;
+    const startY = rect.top - faceRect.top + rect.height;
+    
+    for(let i = 0; i < 2; i++) {
+      setTimeout(() => {
+        const tear = document.createElement('div');
+        tear.className = 'eye-tear';
+        tear.style.left = startX + 'px';
+        tear.style.top = startY + 'px';
+        face.appendChild(tear);
+        let t = 0, v = 0, sway = (Math.random() * 2 - 1) * 4;
+        function animate() {
+          t += 0.016;
+          v += 0.25;
+          const currentTop = startY + v * 12;
+          tear.style.top = currentTop + 'px';
+          tear.style.left = startX + Math.sin(t * 5) * 4 * sway + 'px';
+          if (currentTop > faceRect.height + 30) {
+            if (tear && tear.remove) tear.remove();
+          } else {
+            requestAnimationFrame(animate);
+          }
+        }
+        requestAnimationFrame(animate);
+      }, i * 180);
+    }
+  });
+}
+
+// ==================== 拒绝按钮逃跑 ====================
+function moveDeclineButtonRandomly() {
+  const parentRect = actions.getBoundingClientRect();
+  const btnRect = decline.getBoundingClientRect();
+  
+  let currentLeft = decline.offsetLeft;
+  let currentTop = decline.offsetTop;
+  
+  let maxX = parentRect.width - btnRect.width;
+  let maxY = parentRect.height - btnRect.height;
+  
+  if (maxX < 0) maxX = 0;
+  if (maxY < 0) maxY = 0;
+  
+  let randX = Math.random() * maxX;
+  let randY = Math.random() * maxY;
+  
+  decline.style.transform = `translate(${randX - currentLeft}px, ${randY - currentTop}px)`;
+  decline.style.transition = 'transform 0.2s ease';
+  setTimeout(() => {
+    decline.style.transition = '';
+  }, 200);
+}
+
+decline.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  createEyeTearsBothEyes();
+  moveDeclineButtonRandomly();
+  setSad();
+  setTimeout(() => {
+    if (face.className === 'face sad') {
+      setHappy();
+    }
+  }, 1000);
+});
+
+// ==================== 接受按钮 ====================
+agree.addEventListener('click', () => {
+  setSuperHappy();
+  alert(`已接受！\n姓名：${currentData.name}\n日期：${currentData.date}\n事由：${currentData.reason}`);
+});
+
+// ==================== 编辑功能绑定 ====================
+editBtn.addEventListener('click', openModal);
+modalCancel.addEventListener('click', closeModal);
+modalConfirm.addEventListener('click', saveModalData);
+// 点击模态框背景关闭
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) closeModal();
+});
+
+// ==================== 音乐自动播放 ====================
+let musicPlayAttempts = 0;
+function attemptAutoPlay() {
+  const music = document.getElementById("bgmusic");
+  if (music && music.paused && musicPlayAttempts < 5) {
+    music.play().catch(e => {
+      musicPlayAttempts++;
+      setTimeout(attemptAutoPlay, 500);
+    });
+  }
+}
+setTimeout(attemptAutoPlay, 100);
+
+document.body.addEventListener('touchstart', function once() {
+  const music = document.getElementById("bgmusic");
+  if (music && music.paused) {
+    music.play().catch(e => console.log('播放失败', e));
+  }
+  document.body.removeEventListener('touchstart', once);
+}, { once: true });
+document.body.addEventListener('click', function onceClick() {
+  const music = document.getElementById("bgmusic");
+  if (music && music.paused) {
+    music.play().catch(e => console.log('播放失败', e));
+  }
+  document.body.removeEventListener('click', onceClick);
+}, { once: true });
+
+// ==================== 初始化 ====================
+setHappy();
+updateInfoDisplay();
+
+// 窗口大小改变时重置按钮位置
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (decline.style.transform && decline.style.transform !== 'none' && decline.style.transform !== '') {
+      decline.style.transform = '';
+      decline.style.left = '';
+      decline.style.right = '0';
+      decline.style.top = '25px';
+    }
+    if (face.className === 'face happy' || face.className === 'face') {
+      createHappyMouth();
+    } else if (face.className === 'face sad') {
+      createSadMouth();
+    } else if (face.className === 'face superhappy') {
+      createHappyMouth();
+    }
+  }, 200);
+});
+</script>
+</body>
 </html>
